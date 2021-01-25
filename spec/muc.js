@@ -4662,7 +4662,7 @@ describe("Groupchats", function () {
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current', 0);
 
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
@@ -4703,7 +4703,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current', 0);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
@@ -4726,7 +4726,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current', 0);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
@@ -4745,7 +4745,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current', 0);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
@@ -4763,7 +4763,7 @@ describe("Groupchats", function () {
                 async function (done, _converse) {
 
             await mock.openControlBox(_converse);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-add-muc-modal').click();
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
@@ -4803,7 +4803,7 @@ describe("Groupchats", function () {
                 async function (done, _converse) {
 
             await mock.openControlBox(_converse);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-add-muc-modal').click();
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
@@ -4845,7 +4845,7 @@ describe("Groupchats", function () {
                 async function (done, _converse) {
 
             await mock.openControlBox(_converse);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-list-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('muc-list-modal');
@@ -4922,7 +4922,7 @@ describe("Groupchats", function () {
                 async function (done, _converse) {
 
             await mock.openControlBox(_converse);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-list-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('muc-list-modal');
@@ -4939,7 +4939,7 @@ describe("Groupchats", function () {
                 async function (done, _converse) {
 
             await mock.openControlBox(_converse);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             roomspanel.el.querySelector('.show-list-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('muc-list-modal');
@@ -4989,7 +4989,7 @@ describe("Groupchats", function () {
                 async function (done, _converse) {
 
             await mock.openControlBox(_converse);
-            const roomspanel = _converse.chatboxviews.get('controlbox').roomspanel;
+            const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
             expect(roomspanel.el.querySelectorAll('.available-room').length).toBe(0);
 
             const muc_jid = 'kitchen@conference.shakespeare.lit';
