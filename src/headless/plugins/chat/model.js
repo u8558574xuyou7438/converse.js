@@ -911,6 +911,7 @@ const ChatBox = ModelWithContact.extend({
             return;
         } else {
             u.safeSave(this, {'hidden': false});
+            this.trigger('show');
         }
         return this;
     },
