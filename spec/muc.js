@@ -13,7 +13,7 @@ describe("Groupchats", function () {
 
     describe("The \"rooms\" API", function () {
 
-        fit("has a method 'close' which closes rooms by JID or all rooms when called with no arguments",
+        it("has a method 'close' which closes rooms by JID or all rooms when called with no arguments",
                 mock.initConverse([], {}, async function (done, _converse) {
 
             await mock.openAndEnterChatRoom(_converse, 'lounge@montague.lit', 'romeo');
@@ -51,7 +51,8 @@ describe("Groupchats", function () {
                 mock.initConverse([], {}, async function (done, _converse) {
 
             await mock.waitForRoster(_converse, 'current');
-            await u.waitUntil(() => _converse.rosterview.querySelectorAll('.roster-group .group-toggle').length, 300);
+            const rosterview = document.querySelector('converse-roster');
+            await u.waitUntil(() => rosterview.querySelectorAll('.roster-group .group-toggle').length, 300);
             let muc_jid = 'chillout@montague.lit';
             await mock.openAndEnterChatRoom(_converse, muc_jid, 'romeo');
             let room = await _converse.api.rooms.get(muc_jid);
@@ -103,7 +104,8 @@ describe("Groupchats", function () {
             let chatroomview, IQ_id;
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current');
-            await u.waitUntil(() => _converse.rosterview.querySelectorAll('.roster-group .group-toggle').length);
+            const rosterview = document.querySelector('converse-roster');
+            await u.waitUntil(() => rosterview.querySelectorAll('.roster-group .group-toggle').length);
 
             let room = await _converse.api.rooms.open(jid);
             // Test on groupchat that's not yet open
@@ -196,7 +198,7 @@ describe("Groupchats", function () {
             expect(_converse.connection.sendIQ).toHaveBeenCalled();
 
             const IQ_stanzas = _converse.connection.IQ_stanzas;
-            const iq = IQ_stanzas.filter(s => s.querySelector(`query[xmlns="${Strophe.NS.MUC_OWNER}"]`)).pop();
+            const iq = await u.waitUntil(() => IQ_stanzas.filter(s => s.querySelector(`query[xmlns="${Strophe.NS.MUC_OWNER}"]`)).pop());
             expect(Strophe.serialize(iq)).toBe(
                 `<iq id="${iq.getAttribute('id')}" to="room@conference.example.org" type="get" xmlns="jabber:client">`+
                 `<query xmlns="http://jabber.org/protocol/muc#owner"/></iq>`);
@@ -1389,6 +1391,7 @@ describe("Groupchats", function () {
         }));
 
         it("can be configured if you're its owner", mock.initConverse(['chatBoxesFetched'], {}, async function (done, _converse) {
+
             let sent_IQ, IQ_id;
             const sendIQ = _converse.connection.sendIQ;
             spyOn(_converse.connection, 'sendIQ').and.callFake(function (iq, callback, errback) {
@@ -2679,7 +2682,7 @@ describe("Groupchats", function () {
 
             _converse.connection._dataRecv(mock.createRequest(presence));
 
-            expect(u.isVisible(view.querySelector('.chat-area'))).toBeFalsy();
+            await u.waitUntil(() => !u.isVisible(view.querySelector('.chat-area')));
             expect(u.isVisible(view.querySelector('.occupants'))).toBeFalsy();
             const chat_body = view.querySelector('.chatroom-body');
             expect(chat_body.querySelectorAll('.disconnect-msg').length).toBe(3);
@@ -2732,7 +2735,7 @@ describe("Groupchats", function () {
             _converse.connection._dataRecv(mock.createRequest(presence));
 
             const view = _converse.chatboxviews.get('lounge@montague.lit');
-            expect(u.isVisible(view.querySelector('.chat-area'))).toBeFalsy();
+            await u.waitUntil(() => !u.isVisible(view.querySelector('.chat-area')));
             expect(u.isVisible(view.querySelector('.occupants'))).toBeFalsy();
             const chat_body = view.querySelector('.chatroom-body');
             expect(chat_body.querySelectorAll('.disconnect-msg').length).toBe(2);
@@ -2772,7 +2775,6 @@ describe("Groupchats", function () {
                 // only on the right.
                 expect(_.isEqual(new_attrs.sort(), old_attrs.sort())).toEqual(true);
             }
-            _converse.rosterview.render();
             done();
         }));
 
@@ -4509,7 +4511,7 @@ describe("Groupchats", function () {
             await mock.waitForRoster(_converse, 'current', 0);
 
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
@@ -4534,7 +4536,7 @@ describe("Groupchats", function () {
             await u.waitUntil(() => sizzle('.chatroom', _converse.el).filter(u.isVisible).length === 1);
 
             roomspanel.model.set('muc_domain', 'muc.example.org');
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             label_name = modal.el.querySelector('label[for="chatroom"]');
             expect(label_name.textContent.trim()).toBe('Groupchat address:');
             name_input = modal.el.querySelector('input[name="chatroom"]');
@@ -4548,7 +4550,7 @@ describe("Groupchats", function () {
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current', 0);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
@@ -4569,7 +4571,7 @@ describe("Groupchats", function () {
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current', 0);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
@@ -4586,7 +4588,7 @@ describe("Groupchats", function () {
             await mock.openControlBox(_converse);
             await mock.waitForRoster(_converse, 'current', 0);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
@@ -4602,7 +4604,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
             expect(modal.el.querySelector('.modal-title').textContent.trim()).toBe('Enter a new Groupchat');
@@ -4622,7 +4624,7 @@ describe("Groupchats", function () {
             expect(_.includes(_converse.chatboxes.models.map(m => m.get('id')), 'lounge@muc.example.org')).toBe(true);
 
             // However, you can still open MUCs with different domains
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             await u.waitUntil(() => u.isVisible(modal.el), 1000);
             name_input = modal.el.querySelector('input[name="chatroom"]');
             name_input.value = 'lounge@conference.example.org';
@@ -4641,7 +4643,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             const modal = _converse.api.modal.get('add-chatroom-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000)
             expect(modal.el.querySelector('.modal-title').textContent.trim()).toBe('Enter a new Groupchat');
@@ -4660,7 +4662,7 @@ describe("Groupchats", function () {
             expect(_.includes(_converse.chatboxes.models.map(m => m.get('id')), 'lounge@muc.example.org')).toBe(true);
 
             // However, you can still open MUCs with different domains
-            roomspanel.el.querySelector('.show-add-muc-modal').click();
+            roomspanel.querySelector('.show-add-muc-modal').click();
             await u.waitUntil(() => u.isVisible(modal.el), 1000);
             name_input = modal.el.querySelector('input[name="chatroom"]');
             name_input.value = 'lounge@conference';
@@ -4681,7 +4683,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-list-muc-modal').click();
+            roomspanel.querySelector('.show-list-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('muc-list-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000);
@@ -4758,7 +4760,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-list-muc-modal').click();
+            roomspanel.querySelector('.show-list-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('muc-list-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000);
@@ -4775,7 +4777,7 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            roomspanel.el.querySelector('.show-list-muc-modal').click();
+            roomspanel.querySelector('.show-list-muc-modal').click();
             mock.closeControlBox(_converse);
             const modal = _converse.api.modal.get('muc-list-modal');
             await u.waitUntil(() => u.isVisible(modal.el), 1000);
@@ -4825,15 +4827,15 @@ describe("Groupchats", function () {
 
             await mock.openControlBox(_converse);
             const roomspanel = _converse.chatboxviews.get('controlbox').querySelector('converse-rooms-list');
-            expect(roomspanel.el.querySelectorAll('.available-room').length).toBe(0);
+            expect(roomspanel.querySelectorAll('.available-room').length).toBe(0);
 
             const muc_jid = 'kitchen@conference.shakespeare.lit';
             const message = 'fires: Your attention is required';
             await mock.openAndEnterChatRoom(_converse, muc_jid, 'fires');
             const view = _converse.api.chatviews.get(muc_jid);
-            await u.waitUntil(() => roomspanel.el.querySelectorAll('.available-room').length);
-            expect(roomspanel.el.querySelectorAll('.available-room').length).toBe(1);
-            expect(roomspanel.el.querySelectorAll('.msgs-indicator').length).toBe(0);
+            await u.waitUntil(() => roomspanel.querySelectorAll('.available-room').length);
+            expect(roomspanel.querySelectorAll('.available-room').length).toBe(1);
+            expect(roomspanel.querySelectorAll('.msgs-indicator').length).toBe(0);
 
             view.model.set({'minimized': true});
 
@@ -4845,9 +4847,9 @@ describe("Groupchats", function () {
                     type: 'groupchat'
                 }).c('body').t(message).tree());
             await u.waitUntil(() => view.model.messages.length);
-            expect(roomspanel.el.querySelectorAll('.available-room').length).toBe(1);
-            expect(roomspanel.el.querySelectorAll('.msgs-indicator').length).toBe(1);
-            expect(roomspanel.el.querySelector('.msgs-indicator').textContent.trim()).toBe('1');
+            expect(roomspanel.querySelectorAll('.available-room').length).toBe(1);
+            expect(roomspanel.querySelectorAll('.msgs-indicator').length).toBe(1);
+            expect(roomspanel.querySelector('.msgs-indicator').textContent.trim()).toBe('1');
 
             await view.model.handleMessageStanza($msg({
                 'from': muc_jid+'/'+nick,
@@ -4856,12 +4858,12 @@ describe("Groupchats", function () {
                 'type': 'groupchat'
             }).c('body').t(message).tree());
             await u.waitUntil(() => view.model.messages.length > 1);
-            expect(roomspanel.el.querySelectorAll('.available-room').length).toBe(1);
-            expect(roomspanel.el.querySelectorAll('.msgs-indicator').length).toBe(1);
-            expect(roomspanel.el.querySelector('.msgs-indicator').textContent.trim()).toBe('2');
+            expect(roomspanel.querySelectorAll('.available-room').length).toBe(1);
+            expect(roomspanel.querySelectorAll('.msgs-indicator').length).toBe(1);
+            expect(roomspanel.querySelector('.msgs-indicator').textContent.trim()).toBe('2');
             view.model.set({'minimized': false});
-            expect(roomspanel.el.querySelectorAll('.available-room').length).toBe(1);
-            expect(roomspanel.el.querySelectorAll('.msgs-indicator').length).toBe(0);
+            expect(roomspanel.querySelectorAll('.available-room').length).toBe(1);
+            expect(roomspanel.querySelectorAll('.msgs-indicator').length).toBe(0);
             done();
         }));
     });
@@ -4910,7 +4912,7 @@ describe("Groupchats", function () {
             _converse.connection._dataRecv(mock.createRequest(presence));
 
             const occupant = view.model.occupants.findWhere({'jid': _converse.bare_jid});
-            expect(occupant.get('role')).toBe('visitor');
+            await u.waitUntil(() => occupant.get('role') === 'visitor');
 
             spyOn(_converse.connection, 'send');
             view.model.setChatState(_converse.INACTIVE);
@@ -5217,7 +5219,7 @@ describe("Groupchats", function () {
                 </presence>`);
             _converse.connection._dataRecv(mock.createRequest(stanza));
 
-            expect(view.querySelector('.chat-textarea')).toBe(null);
+            await u.waitUntil(() => view.querySelector('.chat-textarea') === null);
             let bottom_panel = view.querySelector('.muc-bottom-panel');
             expect(bottom_panel.textContent.trim()).toBe("You're not allowed to send messages in this room");
 
@@ -5252,8 +5254,7 @@ describe("Groupchats", function () {
                 </x>
                 </presence>`);
             _converse.connection._dataRecv(mock.createRequest(stanza));
-            bottom_panel = view.querySelector('.muc-bottom-panel');
-            expect(bottom_panel).toBe(null);
+            await u.waitUntil(() => view.querySelector('.muc-bottom-panel') === null);
 
             textarea = view.querySelector('.chat-textarea');
             expect(textarea === null).toBe(false);
